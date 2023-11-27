@@ -1,0 +1,6 @@
+completionpass,mod_realtimequiz
+completionpassdesc,mod_realtimequiz
+completionpass_help,mod_realtimequiz
+completiondetail:passgrade,mod_realtimequiz
+gradetopassnotset,mod_realtimequiz
+basicideasofrealtimequiz,mod_realtimequiz

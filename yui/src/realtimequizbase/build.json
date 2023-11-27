@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_realtimequiz-realtimequizbase",
+    "builds": {
+        "moodle-mod_realtimequiz-realtimequizbase": {
+            "jsfiles": [
+                "realtimequizbase.js"
+            ]
+        }
+    }
+}

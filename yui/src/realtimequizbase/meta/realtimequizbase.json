@@ -1,0 +1,8 @@
+{
+    "moodle-mod_realtimequiz-realtimequizbase": {
+        "requires": [
+            "base",
+            "node"
+        ]
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "moodle-mod_realtimequiz-questionchooser": {
+        "requires": [
+            "moodle-core-chooserdialogue",
+            "moodle-mod_realtimequiz-util",
+            "querystring-parse"
+        ]
+    }
+}

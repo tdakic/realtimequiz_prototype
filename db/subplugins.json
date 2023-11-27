@@ -1,0 +1,6 @@
+{
+    "plugintypes": {
+        "realtimequiz": "mod\/realtimequiz\/report",
+        "realtimequizaccess": "mod\/realtimequiz\/accessrule"
+    }
+}

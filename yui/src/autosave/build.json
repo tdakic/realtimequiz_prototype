@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_realtimequiz-autosave",
+    "builds": {
+        "moodle-mod_realtimequiz-autosave": {
+            "jsfiles": [
+                "autosave.js"
+            ]
+        }
+    }
+}

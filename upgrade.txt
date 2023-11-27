@@ -1,0 +1,369 @@
+This files describes API changes in the realtimequiz code.
+
+=== 4.2 ===
+
+* For the three realtimequiz web services: mod_realtimequiz_get_attempt_data, mod_realtimequiz_get_attempt_summary and
+  mod_realtimequiz_get_attempt_review, the ->number property of each question is now deprecated
+  (It had the wrong time and was documented wrongly.) In the future, please use the new property
+  ->questionnumber. Note, this question 'number' can include any string (e.g. 'Qs 1 & 2') so it is
+  important to applying htmlspecialchars, or equivalent, to the value if you are outputting to HTML.
+
+* The methods in the realtimequiz_settings class which return a URL now all return a moodle_url. Previously
+  some returns a moodle_url and others aa string.
+
+* 'firstslotid' value is not used in section_shuffle_updated event anymore.
+
+* The realtimequiz has a lot of old classes in lib.php files. These have now been moved into the classes folder,
+  and so are now in namespaces. Because of Moodle's class renaming support, your code should continue
+  working, but output deprecated warnings, so you probably want to update. This should mostly be
+  doable by adding use statements, and a search/replace.
+  - mod_realtimequiz_display_options => mod_realtimequiz\question\display_options
+  - qubaids_for_realtimequiz => mod_realtimequiz\question\qubaids_for_realtimequiz
+  - qubaids_for_realtimequiz_user => mod_realtimequiz\question\qubaids_for_realtimequiz_user - which is deprecated, because
+          it is almost the same as mod_realtimequiz\question\qubaids_for_users_attempts.
+  - mod_realtimequiz_admin_setting_browsersecurity => mod_realtimequiz\admin\browser_security_setting
+  - mod_realtimequiz_admin_setting_grademethod => mod_realtimequiz\admin\grade_method_setting
+  - mod_realtimequiz_admin_setting_overduehandling => mod_realtimequiz\admin\overdue_handling_setting
+  - mod_realtimequiz_admin_review_setting => mod_realtimequiz\admin\review_setting
+  - mod_realtimequiz_admin_setting_user_image => mod_realtimequiz\admin\user_image_setting
+  - mod_realtimequiz_admin_setting_browsersecurity => mod_realtimequiz\admin\browser_security_setting
+  - mod_realtimequiz_admin_setting_grademethod => mod_realtimequiz\admin\grade_method_setting
+  - mod_realtimequiz_admin_setting_overduehandling => mod_realtimequiz\admin\overdue_handling_setting
+  - mod_realtimequiz_admin_review_setting => mod_realtimequiz\admin\review_setting
+  - mod_realtimequiz_admin_setting_user_image => mod_realtimequiz\admin\user_image_setting
+  - mod_realtimequiz\adminpresets\adminpresets_mod_realtimequiz_admin_setting_browsersecurity =>
+            mod_realtimequiz\adminpresets\adminpresets_browser_security_setting
+  - mod_realtimequiz\adminpresets/adminpresets_mod_realtimequiz_admin_setting_grademethod =>
+            mod_realtimequiz\adminpresets\adminpresets_grade_method_setting
+  - mod_realtimequiz\adminpresets\adminpresets_mod_realtimequiz_admin_setting_overduehandling =>
+            mod_realtimequiz\adminpresets\adminpresets_overdue_handling_setting
+  - mod_realtimequiz\adminpresets\adminpresets_mod_realtimequiz_admin_review_setting =>
+            mod_realtimequiz\adminpresets\adminpresets_review_setting
+  - mod_realtimequiz\adminpresets\adminpresets_mod_realtimequiz_admin_setting_user_image =>
+            mod_realtimequiz\adminpresets\adminpresets_user_image_setting
+  - realtimequiz_default_report => mod_realtimequiz\local\reports\report_base
+  - realtimequiz_attempts_report => mod_realtimequiz\local\reports\attempts_report
+  - mod_realtimequiz_attempts_report_form => mod_realtimequiz\local\reports\attempts_report_options_form
+  - mod_realtimequiz_attempts_report_options => mod_realtimequiz\local\reports\attempts_report_options
+  - realtimequiz_attempts_report_table => mod_realtimequiz\local\reports\attempts_report_table
+  - realtimequiz_access_manager => mod_realtimequiz\access_manager
+  - mod_realtimequiz_preflight_check_form => mod_realtimequiz\form\preflight_check_form
+  - realtimequiz_override_form => mod_realtimequiz\form\edit_override_form
+  - realtimequiz_access_rule_base => mod_realtimequiz\local\access_rule_base
+  - realtimequiz_add_random_form => mod_realtimequiz\form\add_random_form
+  - mod_realtimequiz_links_to_other_attempts => mod_realtimequiz\output\links_to_other_attempts
+  - mod_realtimequiz_view_object => mod_realtimequiz\output\view_page
+  - mod_realtimequiz_renderer => mod_realtimequiz\output\renderer
+  - realtimequiz_nav_question_button => mod_realtimequiz\output\navigation_question_button
+  - realtimequiz_nav_section_heading => mod_realtimequiz\output\navigation_section_heading
+  - realtimequiz_nav_panel_base => mod_realtimequiz\output\navigation_panel_base
+  - realtimequiz_attempt_nav_panel => mod_realtimequiz\output\navigation_panel_attempt
+  - realtimequiz_review_nav_panel => mod_realtimequiz\output\navigation_panel_review
+  - realtimequiz_attempt => mod_realtimequiz\realtimequiz_attempt
+  - realtimequiz => mod_realtimequiz\realtimequiz_settings
+  - realtimequizaccess_seb\realtimequiz_settings => realtimequizaccess_seb\seb_realtimequiz_settings
+  - realtimequizaccess_seb\access_manager => realtimequizaccess_seb\seb_access_manager
+
+* The following classes have been deprecated:
+  - mod_realtimequiz_overdue_attempt_updater - merged into mod_realtimequiz\task\update_overdue_attempts
+  - moodle_realtimequiz_exception - just use normal moodle_exception
+
+* As part of the clean-up, the following files are no longer required, and if you try to
+  include them, you will get a debugging notices telling you not to:
+  - mod/realtimequiz/report/attemptsreport.php
+  - mod/realtimequiz/report/attemptsreport_form.php
+  - mod/realtimequiz/report/attemptsreport_options.php
+  - mod/realtimequiz/report/attemptsreport_table.php
+  - mod/realtimequiz/report/default.php
+  - mod/realtimequiz/accessmanager.php
+  - mod/realtimequiz/accessmanager_form.php
+  - mod/realtimequiz/cronlib.php
+  - mod/realtimequiz/override_form.php
+  - mod/realtimequiz/accessrule/accessrulebase.php
+  - mod/realtimequiz/renderer.php - actually, no debugging ouput for this one because of how renderer factories work.
+  - mod/realtimequiz/attemptlib.php
+
+* Various functions related to calculating grades have moved into a new class mod_realtimequiz\grade_calculator.
+  You get that using $realtimequizobj->get_grade_calculator(), then the following old functions have become these new methods.
+  - realtimequiz_update_sumgrades -> recompute_realtimequiz_sumgrades
+  - realtimequiz_update_all_attempt_sumgrades -> recompute_all_attempt_sumgrades
+  - realtimequiz_update_all_final_grades -> recompute_all_final_grades
+  - realtimequiz_set_grade -> update_realtimequiz_maximum_grade
+  - realtimequiz_save_best_grade -> recompute_final_grade
+  - realtimequiz_calculate_best_grade -> [no public direct replacement]
+  - realtimequiz_calculate_best_attempt - [no replacement. It was not used.]
+
+* Final deprecation (complete removal) of the following functions which were deprecated long ago:
+  - realtimequiz_groups_member_added_handler - deprecated since 2.6
+  - realtimequiz_groups_member_removed_handler - deprecated since 2.6
+  - realtimequiz_groups_group_deleted_handler - deprecated since 2.6
+  - realtimequiz_groups_members_removed_handler - deprecated since 2.6
+  - The method realtimequiz_settings::confirm_start_attempt_message - deprecated in Moodle 3.1
+  - The field view_page::$startattemptwarning - deprecated in Moodle 3.1
+  - attempts_report::load_relevant_students - deprecated since 3.2
+  - realtimequiz_statistics_graph_get_new_colour - deprecated since 3.2
+  - The file mod/realtimequiz/report/overview/overviewgraph.php - deprecated since 3.2
+  - The file mod/realtimequiz/report/statistics/statistics_graph.php - deprecated since 3.2
+  - realtimequiz_print_overview - deprecated since 3.3
+
+* For properties that were previously only declared dynamically, a few classes now include property declarations to support PHP 8.2.
+  The affected classes are:
+   - restore_realtimequiz_activity_structure_step
+   - attempts_report_table
+   - attempts_report
+   - realtimequiz_overview_report (Removing $hasgroupstudents, because the parent attempts_report class has the same variable.)
+
+=== 4.1 ===
+
+* realtimequiz_has_question_use is now deprecated. Use mod_realtimequiz\structure::has_use_capability istead.
+
+
+=== 4.0.3, 4.1 ===
+
+* If a realtimequiz is sequential the external functions mod_realtimequiz_external::get_attempt_data, mod_realtimequiz_external::get_attempt_summary will not return any data
+related to out of sequence question except while reviewing the realtimequiz (MDL-75210).
+
+=== 4.0.2, 4.1 ===
+
+* No external code should be calling realtimequiz_overview_report::regrade_attempt because it is an
+  internal method of the realtimequiz_overview plugin. But if you are incorrectly using it, be aware
+  that the API changed slightly. It now returns an array listing any questions which could
+  not be regraded.
+* New method called get_number_of_unanswered_questions() has been added to mod/realtimequiz/attemptlib.php
+  to get the total number of unanswered questions in the current attempt.
+
+=== 4.0 ===
+
+* The following API methods have a new parameter, $studentisonline, to define whether the student is currently interacting:
+  - process_finish() in mod/realtimequiz/attemptlib.php
+  - realtimequiz_send_confirmation() in mod/realtimequiz/locallib.php
+  - realtimequiz_send_notification_messages() in mod/realtimequiz/locallib.php
+* The completionpass criteria has been moved to core as 'completionpassgrade'. Refer to completion/upgrade.txt for
+  further information.
+* New argument realtimequizhasquestions has been added to public methods: view_information in mod/realtimequiz/renderer.php.
+* The function no_questions_message() in class mod_realtimequiz_renderer is deprecated. There is no replacement.
+* Related to the Moodle 4.0 question bank changes, the realtimequiz_slots database table.
+  The fields removed are now manage by new core_question tables:
+  - question_references -> Records where a specific question is used.
+  - question_set_references -> Records where groups of questions are used (e.g. random questions).
+* The realtimequiz_slots_tags database table has been removed entirely, as has the get_slot_tags_for_slot_id() method
+  from mod/realtimequiz/classes/structure.php and the the locallib.php functions realtimequiz_retrieve_slot_tags and
+  realtimequiz_retrieve_slot_tag_ids. This information is now stored in question_set_references
+  and can be accessed in the results of qbank_helper::get_question_structure.
+
+
+=== 3.11 ===
+
+* External function mod_realtimequiz_external::get_user_best_grade now returns and additional optional field:
+  - gradetopass: The grade to pass the realtimequiz (if set)
+
+
+=== 3.10.1 ===
+
+* External functions mod_realtimequiz_external::get_attempt_data, mod_realtimequiz_external::get_attempt_summary
+  and mod_realtimequiz_external::get_attempt_review now return a new additional optional field:
+   - settings: Containing the question definition settings for displaying the question in an external system.
+
+=== 3.10 ===
+
+* External functions mod_realtimequiz_external::get_attempt_data, mod_realtimequiz_external::get_attempt_summary
+  and mod_realtimequiz_external::get_attempt_review now return a new additional optional field:
+   - responsefileareas: Containing the user responses to questions file area names including files.
+
+=== 3.7 ===
+
+* Quiz_cron() has been removed. Sub-plugins should implemented scheduled tasks, however legacy cron in subplugins are
+  supported.
+
+=== 3.6 ===
+
+* The following renamed classes have been completely removed:
+  - realtimequiz_question_bank_view (now: mod_realtimequiz\question\bank\custom_view)
+  - question_bank_add_to_realtimequiz_action_column (now: mod_realtimequiz\question\bank\add_action_column)
+  - question_bank_question_name_text_column (now: mod_realtimequiz\question\bank\question_name_text_column)
+
+=== 3.5 ===
+* Removed questionbank.ajax.php. Please use the realtimequiz_question_bank fragment instead.
+* Adding "random" questions to a realtimequiz via realtimequiz_add_realtimequiz_question() has been deprecated. Please use realtimequiz_add_random_questions().
+
+=== 3.3.2 ===
+
+* realtimequiz_refresh_events() Now takes two additional parameters to refine the update to a specific instance. This function
+  now optionally takes the module instance object or ID, and the course module object or ID. Please try to send the full
+  objects instead of the ids to save DB calls.
+
+=== 3.2 ===
+
+* External functions mod_realtimequiz_external::get_attempt_data, mod_realtimequiz_external::get_attempt_summary
+  and mod_realtimequiz_external::get_attempt_review now return additional optional fields:
+   - blockedbyprevious: Whether a question is blocked by the previous question.
+
+=== 3.1 ===
+
+* realtimequiz_attempt::question_print_comment_fields() has been removed. It was broken
+  since at least Moodle 2.0.
+
+* realtimequiz::confirm_start_attempt_message and mod_realtimequiz_view_object::$startattemptwarning
+  have been deprecated. This functionality is now entirely handled within the
+  realtimequiz access rule plugins.
+
+* The third argument to mod_realtimequiz_renderer::start_attempt_button has been changed
+  from a warning string to a mod_realtimequiz_preflight_check_form.
+
+* mod_realtimequiz_renderer::review_next_navigation has a new optional argument. If you
+  have overridden that method, consider updating your code to match.
+
+* mod_realtimequiz\output\edit_renderer::start_section_list now takes $structure as an
+  argument. If you have overridden this method (it's hard to believe anyone ever
+  would) you will need to update your renderer.
+
+* Several methods relating to preview links/buttons/urls have a new optional
+  argument to make the preview be of a particular variant.
+
+
+=== 2.9 ===
+
+* There have been changes in classes/output/edit_renderer.php for MDL-40990.
+  + Some methods use to take $structure & $question as the first two arguments.
+    They now take $structure & $slot number. If you need $question, you can get
+    it using $question = $structure->get_question_in_slot($slot);
+  + Some methods used to take $realtimequiz & $question. They now take $structure & $slot
+    number. You can get $question as above. $realtimequiz is $structure->get_realtimequiz().
+  + initialise_editing_javascript has had some redundant arguments removed.
+  Hopefully, with these changes, we will have less need to make other changes in future.
+
+* Due to MDL-40992, you should be aware that extra slots can get added to an attempt.
+  You may get slot numbers beyone the end of the original realtimequiz layout, and you
+  may want to call $attemptobj->get_original_slot to find where the question
+  originally came from.
+
+* You now need to pass an instance of the mod_realtimequiz_renderer if you call
+  $attemptobj->render_question or $attemptobj->render_question_at_step.
+
+* The array values in mod_realtimequiz_links_to_other_attempts may now be either a moodle_url,
+  or renderable (or null). Previously they could only be a moodle_url or null.
+
+* The contents of the navigation block is now not just realtimequiz_nav_question_button-s.
+  It can also contain realtimequiz_nav_section_heading-s. If you have overridden
+  mod_realtimequiz_renderer::navigation_panel, then you may need to account for this.
+  This change also has implications for the Edit realtimequiz page.
+
+
+=== 2.8 ===
+
+* Classes that were defined in various lib files have been moved to the classes
+  folder to take advantage of auto-loading. This has involved renaming them.
+  see the list in mod/realtimequiz/db/renamedclasses.php.
+
+* The realtimequiz no longer handles its own \mod_realtimequiz\event\attempt_becameoverdue event,
+  and so the event handler function realtimequiz_attempt_overdue_handler has been deleted.
+  Also, the internal function realtimequiz_send_overdue_message has add the arguments
+  changed. It now takes the $attemptobj object, not separate stdClass objects.
+
+* Major changes to the Edit realtimequiz page.
+
+  The goal of this work was to increase usability, and also clean up the page
+  enough that it will be possible to add new features in future.
+
+  Display of mod/realtimequiz/edit.php is now entirely generated by
+  mod_realtimequiz\output\edit_renderer. This uses a helper class mod_realtimequiz\structure
+  to provide details of the structure of the realtimequiz, and mod_realtimequiz\repaginate to
+  alter that structure. (Actually, there are still some modification methods on
+  mod_realtimequiz\structure. Expect that to be cleaned up in future.)
+
+  The new code uses much more ajax, and there are new scripts mod/realtimequiz/edit_rest.php
+  and mod/realtimequiz/repaginate.php to handle this. (Again, don't be surprised if those
+  two scripts get merged in future.) Also questionbank.ajax.php (which may, in
+  future, be made more generic, and moved into the core question bank code.)
+
+  As a result of this, mod/realtimequiz/editlib.php has gone. (A few remaining functions
+  were moved to locallib.php.)
+
+  Here is a list of all the old functions or classes that have changed.
+  If you used any of these in custom code, you will need to update your code.
+  (Note that many of these functions should have been considered private internals
+  of the realtimequiz module, and you should not have been using them!)
+
+  From editlib.php:
+      realtimequiz_remove_slot
+      realtimequiz_delete_empty_page
+      realtimequiz_add_page_break_after_slot    - Use methods of structure or repaginate
+      realtimequiz_update_slot_maxmark          - classes instead.
+      _realtimequiz_move_question
+      realtimequiz_move_question_up
+      realtimequiz_move_question_down
+
+      realtimequiz_print_question_list
+      realtimequiz_print_pagecontrols
+      realtimequiz_print_singlequestion         - Use methods of edit_renderer instead.
+      realtimequiz_print_randomquestion
+      realtimequiz_print_singlequestion_reordertool
+      realtimequiz_print_randomquestion_reordertool
+      print_random_option_icon
+      realtimequiz_print_grading_form
+      realtimequiz_print_status_bar
+
+  Moved from editlib.php to locallib.php:
+      realtimequiz_question_tostring - now always returns a string (the only option used).
+                               The $return argument has gone.
+
+  Old editing JavaScript (e.g. mod/realtimequiz/edit.js) is gone. Replaced with YUI modules.
+
+
+=== 2.7.1 ===
+
+* The function realtimequiz_fire_attempt_started_event has been removed. This function
+  should not have been used outside the realtimequiz, but if you were using it, you should
+  trigger the event outside this function. Note that the appropriate start event is
+  fired automatically by the realtimequiz_attempt_save_started function.
+
+
+=== 2.7 ===
+
+* The old realtimequiz.questions database column (comma-separated list of question ids)
+  is gone, and instead the realtimequiz_question_instances table has been renamed to
+  to realtimequiz_slots. Some of the columns of that table have been renamed to match
+  the coding guidelines. Specifically:
+      realtimequiz     -> realtimequizid
+      question -> questionid
+      grade    -> maxmark
+  also there are two new columns:
+      slot     -  numbers the questions in the realtimequiz in order, as on the edit realtimequiz page.
+      page     -  new way to determine which question is on which page.
+  naturally, other parts of the code and APIs have been updated to reflect that
+  change.
+
+* The following functions, which were part of the internal workings of the realtimequiz,
+  have been removed.
+      realtimequiz_get_slot_for_question
+      realtimequiz_number_of_questions_in_realtimequiz
+      realtimequiz_repaginate               (there is now a realtimequiz_repaginate_questions with a different API).
+      realtimequiz_add_page_break_at        (see realtimequiz_add_page_break_after_slot)
+      realtimequiz_add_page_break_after     (see realtimequiz_add_page_break_after_slot)
+      realtimequiz_number_of_pages
+      realtimequiz_remove_question          (see realtimequiz_remove_slot)
+      realtimequiz_update_question_instance (see realtimequiz_update_slot_maxmark)
+
+* The following internal functions have had their API changed.
+      realtimequiz_delete_empty_page: has had its arguments changed to $realtimequiz and $pagenumber.
+      realtimequiz_has_question_use: now takes $realtimequiz and $slot, not $questionid.
+
+
+=== 2.6 ===
+
+* As part of improving the page usability and accessibility, we updated the
+  heading levels for realtimequiz module so it has a proper nesting. (MDL-41615)
+
+* mod_realtimequiz_renderer::view_best_score has been removed. (It did not do what the
+  name suggested anyway.)
+
+
+=== 2.4 ===
+
+* mod_realtimequiz_renderer::finish_review_link now requires $attemptobj to be passed in
+  instead of a moodle_url.
+
+
+=== Earlier changes ===
+
+* Were not documented in this way. Sorry.

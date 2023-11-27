@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_realtimequiz-modform",
+    "builds": {
+        "moodle-mod_realtimequiz-modform": {
+            "jsfiles": [
+                "modform.js"
+            ]
+        }
+    }
+}

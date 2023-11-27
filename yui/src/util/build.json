@@ -1,0 +1,21 @@
+{
+  "name": "moodle-mod_realtimequiz-util",
+  "builds": {
+    "moodle-mod_realtimequiz-util-base": {
+      "jsfiles": [
+        "base.js"
+      ]
+    },
+    "moodle-mod_realtimequiz-util-slot": {
+      "jsfiles": [
+        "slot.js"
+      ]
+    }
+    ,
+    "moodle-mod_realtimequiz-util-page": {
+      "jsfiles": [
+        "page.js"
+      ]
+    }
+  }
+}

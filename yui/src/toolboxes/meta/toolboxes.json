@@ -1,0 +1,14 @@
+{
+    "moodle-mod_realtimequiz-toolboxes": {
+        "requires": [
+            "base",
+            "node",
+            "event",
+            "event-key",
+            "io",
+            "moodle-mod_realtimequiz-realtimequizbase",
+            "moodle-mod_realtimequiz-util-slot",
+            "moodle-core-notification-ajaxexception"
+        ]
+    }
+}
