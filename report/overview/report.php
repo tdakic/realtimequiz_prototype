@@ -254,24 +254,16 @@ class realtimequiz_overview_report extends attempts_report {
     }
     //*****************************************************************
     //TTT added
-    public function display_final_graph($realtimequiz, $cm, $course) {
+
+    /* returns the chart with the final results of the quiz */
+    public function get_final_chart_RT($realtimequiz, $cm, $course) {
       global $DB, $PAGE;
 
       list($currentgroup, $studentsjoins, $groupstudentsjoins, $allowedjoins) = $this->init(
               'overview', 'realtimequiz_overview_settings_form', $realtimequiz, $cm, $course);
 
-
-
       $options = new realtimequiz_overview_options('overview', $realtimequiz, $cm, $course);
-
-      if ($fromform = $this->form->get_data()) {
-          $options->process_settings_from_form($fromform);
-
-      } else {
-          $options->process_settings_from_params();
-      }
-
-      $this->form->set_data($options->get_initial_form_data());
+      $options->process_settings_from_params();
 
       // Load the required questions.
       $questions = realtimequiz_report_get_significant_questions($realtimequiz);
@@ -317,14 +309,6 @@ class realtimequiz_overview_report extends attempts_report {
 
       // Start output.
       $hasquestions = realtimequiz_has_questions($realtimequiz->id);
-      if (!$table->is_downloading()) {
-          // Only print headers if not asked to download data.
-    //     $this->print_standard_header_and_messages($cm, $course, $realtimequiz,
-      //           $options, $currentgroup, $hasquestions, $hasstudents);
-
-          // Print the display options.
-          //$this->form->display();
-      }
 
       $hasstudents = $hasstudents && (!$currentgroup || $this->hasgroupstudents);
       if ($hasquestions && ($hasstudents || $options->attempts == self::ALL_WITH)) {
@@ -332,94 +316,13 @@ class realtimequiz_overview_report extends attempts_report {
           $table->setup_sql_queries($allowedjoins);
 
           if (!$table->is_downloading()) {
-              // Output the regrade buttons.
-              if (has_capability('mod/realtimequiz:regrade', $this->context)) {
-                /*  $regradesneeded = $this->count_question_attempts_needing_regrade(
-                          $realtimequiz, $groupstudentsjoins);
-                  if ($currentgroup) {
-                      $a= new stdClass();
-                      $a->groupname = format_string(groups_get_group_name($currentgroup), true, [
-                          'context' => $this->context,
-                      ]);
-                      $a->coursestudents = get_string('participants');
-                      $a->countregradeneeded = $regradesneeded;
-                      $regradealldrydolabel =
-                              get_string('regradealldrydogroup', 'realtimequiz_overview', $a);
-                      $regradealldrylabel =
-                              get_string('regradealldrygroup', 'realtimequiz_overview', $a);
-                      $regradealllabel =
-                              get_string('regradeallgroup', 'realtimequiz_overview', $a);
-                  } else {
-                      $regradealldrydolabel =
-                              get_string('regradealldrydo', 'realtimequiz_overview', $regradesneeded);
-                      $regradealldrylabel =
-                              get_string('regradealldry', 'realtimequiz_overview');
-                      $regradealllabel =
-                              get_string('regradeall', 'realtimequiz_overview');
-                  }
-                  $displayurl = new moodle_url($options->get_url(), ['sesskey' => sesskey()]);
-                  echo '<div class="regradebuttons">';
-                  echo '<form action="'.$displayurl->out_omit_querystring().'">';
-                  echo '<div>';
-                  echo html_writer::input_hidden_params($displayurl);
-                  echo '<input type="submit" class="btn btn-secondary" name="regradeall" value="'.$regradealllabel.'"/>';
-                  echo '<input type="submit" class="btn btn-secondary ml-1" name="regradealldry" value="' .
-                          $regradealldrylabel . '"/>';
-                  if ($regradesneeded) {
-                      echo '<input type="submit" class="btn btn-secondary ml-1" name="regradealldrydo" value="' .
-                              $regradealldrydolabel . '"/>';
-                  }
-                  echo '</div>';
-                  echo '</form>';
-                  echo '</div>';*/
-              }
+
               // Print information on the grading method.
               if ($strattempthighlight = realtimequiz_report_highlighting_grading_method(
                       $realtimequiz, $this->qmsubselect, $options->onlygraded)) {
                   //echo '<div class="realtimequizattemptcounts mt-3">' . $strattempthighlight . '</div>';
               }
           }
-
-          // Define table columns.
-        /*  $columns = [];
-          $headers = [];
-
-          if (!$table->is_downloading() && $options->checkboxcolumn) {
-              $columnname = 'checkbox';
-              $columns[] = $columnname;
-              $headers[] = $table->checkbox_col_header($columnname);
-          }
-
-          $this->add_user_columns($table, $columns, $headers);
-          $this->add_state_column($columns, $headers);
-          $this->add_time_columns($columns, $headers);
-*/
-        /*  $this->add_grade_columns($realtimequiz, $options->usercanseegrades, $columns, $headers, false);
-
-          if (!$table->is_downloading() && has_capability('mod/realtimequiz:regrade', $this->context) &&
-                  $this->has_regraded_questions($table->sql->from, $table->sql->where, $table->sql->params)) {
-              $columns[] = 'regraded';
-              $headers[] = get_string('regrade', 'realtimequiz_overview');
-          }*/
-
-        /*  if ($options->slotmarks) {
-              foreach ($questions as $slot => $question) {
-                  $columns[] = 'qsgrade' . $slot;
-                  $header = get_string('qbrief', 'realtimequiz', $question->number);
-                  if (!$table->is_downloading()) {
-                      $header .= '<br />';
-                  } else {
-                      $header .= ' ';
-                  }
-                  $header .= '/' . realtimequiz_rescale_grade($question->maxmark, $realtimequiz, 'question');
-                  $headers[] = $header;
-              }
-          }*/
-
-          //$this->set_up_table_columns($table, $columns, $headers, $this->get_base_url(), $options, false);
-          //$table->set_attribute('class', 'generaltable generalbox grades');
-
-          //$table->out($options->pagesize, true);
       }
 
       if (!$table->is_downloading() && $options->usercanseegrades) {
@@ -441,14 +344,6 @@ class realtimequiz_overview_report extends attempts_report {
                       'context' => $this->context,
                   ]);
                   $graphname = get_string('overviewreportgraphgroup', 'realtimequiz_overview', $groupname);
-                  // Numerical range data should display in LTR even for RTL languages.
-                  // TTT
-
-                  //$PAGE->set_state(moodle_page::STATE_PRINTING_HEADER);
-                  //$PAGE->set_state(moodle_page::STATE_IN_BODY);
-                  // end TTT
-                  echo $output->chart($chart, $graphname, ['dir' => 'ltr']);
-                  //echo var_dump($data);
               }
           }
 
@@ -456,16 +351,13 @@ class realtimequiz_overview_report extends attempts_report {
               $data = realtimequiz_report_grade_bands($bandwidth, $bands, $realtimequiz->id, new \core\dml\sql_join());
               $chart = self::get_chart($labels, $data);
               $graphname = get_string('overviewreportgraph', 'realtimequiz_overview');
-              // Numerical range data should display in LTR even for RTL languages.
-              echo $output->chart($chart, $graphname, ['dir' => 'ltr']);
-              //echo var_dump($data);
           }
       }
       //TTT $PAGE->set_state(moodle_page::STATE_DONE);
-      return true;
+      return $chart;
+
 
     }
-
     //*****************************************************************
     /**
      * Extends parent function processing any submitted actions.

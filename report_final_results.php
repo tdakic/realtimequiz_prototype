@@ -43,15 +43,16 @@ $realtimequiz = $realtimequizobj->get_realtimequiz();
 $cm = $realtimequizobj->get_cm();
 $course = $realtimequizobj->get_course();
 
-$url = new moodle_url('/mod/realtimequiz/report_final_results.php', ['id' => $cm->id]);
+$url = new moodle_url('/mod/realtimequiz/view.php', ['id' => $cm->id]);
 if ($mode !== '') {
     $url->param('mode', $mode);
 }
 $PAGE->set_url($url);
 
 require_login($course, false, $cm);
-$PAGE->set_pagelayout('report');
-$PAGE->activityheader->disable();
+
+//$PAGE->set_pagelayout('report');
+//$PAGE->activityheader->disable();
 $reportlist = realtimequiz_report_list($realtimequizobj->get_context());
 if (empty($reportlist)) {
     throw new \moodle_exception('erroraccessingreport', 'realtimequiz');
@@ -81,27 +82,61 @@ if (!class_exists($reportclassname)) {
 
 $report = new $reportclassname();
 
-//$report->display($realtimequiz, $cm, $course);
-//TTT
-$report->display_final_graph($realtimequiz, $cm, $course);
+$c = $report->get_final_chart_RT($realtimequiz, $cm, $course);
 
-echo "<script> var M = {}; M.yui = {};</script>";
-echo  '<script src="http://localhost/moodle/lib/javascript.php/1698861951/lib/javascript-static.js"></script>';
+$chartdata = json_encode($c);
 
-// Print footer.
-//echo $OUTPUT->footer();
-//echo $OUTPUT->footer_actions();
+require_once($CFG->dirroot . '/lib/mustache/src/Mustache/Autoloader.php');
+Mustache_Autoloader::register();
 
-$footer = $PAGE->opencontainers->pop('header/footer');
-$ttt = $PAGE->requires->get_end_code();
-echo $ttt;
-//echo $footer;
+$loader = new \core\output\mustache_filesystem_loader();
+$stringhelper = new \core\output\mustache_string_helper();
+$cleanstringhelper = new \core\output\mustache_clean_string_helper();
+$quotehelper = new \core\output\mustache_quote_helper();
+$jshelper = new \core\output\mustache_javascript_helper($PAGE);
+$shortentexthelper = new \core\output\mustache_shorten_text_helper();
+$userdatehelper = new \core\output\mustache_user_date_helper();
 
-//$PAGE->set_state(moodle_page::STATE_DONE);
+$helpers = array('config' => $safeconfig,
+                 'str' => array($stringhelper, 'str'),
+                 'cleanstr' => array($cleanstringhelper, 'cleanstr'),
+                 'quote' => array($quotehelper, 'quote'),
+                 'js' => array($jshelper, 'help'),
+                 'pix' => array($pixhelper, 'pix'),
+                 'shortentext' => array($shortentexthelper, 'shorten'),
+                 'userdate' => array($userdatehelper, 'transform'),
+             );
 
-//$PAGE -> opencontainers -> pop('header/footer');
+// Custom chart.mustache file used as I couldn't figure out how to have {{#js}} rendered as <script>
+// and {{/js}} rendered as >/script>
 
-// Log that this report was viewed.
+
+$mustache = new Mustache_Engine(array(
+                'loader' => new Mustache_Loader_FilesystemLoader($CFG->dirroot .'/mod/realtimequiz'),
+                'helpers' => $helpers
+             ));
+
+/*$mustache = new \core\output\mustache_engine(array(
+    'cache' => $cachedir,
+    'escape' => 's',
+    'loader' => $loader,
+    'helpers' => $helpers,
+    'pragmas' => [Mustache_Engine::PRAGMA_BLOCKS],
+    // Don't allow the JavaScript helper to be executed from within another
+    // helper. If it's allowed it can be used by users to inject malicious
+    // JS into the page.
+    'disallowednestedhelpers' => ['js'],
+    // Disable lambda rendering - content in helpers is already rendered, no need to render it again.
+    'disable_lambda_rendering' => false,
+));
+$template = $mustache->loadTemplate('core/chart');
+*/
+
+$template = $mustache->loadTemplate('chart');
+echo trim($template->render(array('chartdata'=>$chartdata, 'uniqid'=>"12345", 'withtable'=>false)));
+
+
+//Log that this report was viewed
 $params = [
     'context' => $realtimequizobj->get_context(),
     'other' => [
@@ -113,46 +148,3 @@ $event = \mod_realtimequiz\event\report_viewed::create($params);
 $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot('realtimequiz', $realtimequiz);
 $event->trigger();
-
-
-
-
-
-//TTT
-//$report->display($realtimequiz, $cm, $course);
-//$PAGE->set_state(moodle_page::STATE_BEFORE_HEADER);
-//$PAGE->_state = (moodle_page::STATE_PRINTING_HEADER);
-//$PAGE->set_state(moodle_page::STATE_PRINTING_HEADER);
-//$PAGE->set_state(moodle_page::STATE_IN_BODY);
-//$PAGE->header();
-//$report->display_final_graph($realtimequiz, $cm, $course);
-//$PAGE->set_state(moodle_page::STATE_DONE);
-/*try {
-      $PAGE->set_state(moodle_page::STATE_DONE);
-}
-catch(Exception $e) {
-  echo 'Message: ' .$e->getMessage();
-}*/
-
-
-//echo $OUTPUT->footer_actions();
-
-//const STATE_BEFORE_HEADER = 0;
-
-/** The state the page is in temporarily while the header is being printed **/
-//const STATE_PRINTING_HEADER = 1;
-
-/** The state the page is in while content is presumably being printed **/
-//const STATE_IN_BODY = 2;
-
-/**
- * The state the page is when the footer has been printed and its function is
- * complete.
- */
-//const STATE_DONE = 3;
-
-// Print footer.
-//$PAGE->set_state(0);
-//$PAGE->set_state(1);
-//$PAGE->set_state(2);
-//$PAGE->set_state(3);

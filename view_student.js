@@ -151,36 +151,6 @@ function realtimequiz_set_question_text(text) {
     document.getElementById('questiontext').innerHTML = text.replace(/\n/g, '<br />');
 }
 
-function realtimequiz_set_question_image(url, width, height) {
-    if (url) {
-        document.getElementById('questionimage').innerHTML = '<image style="border: 1px solid black; float: right;" src="'+url+'" height="'+height+'px" width="'+width+'px" />';
-    } else {
-        document.getElementById('questionimage').innerHTML = '';
-    }
-}
-
-function realtimequiz_clear_answers() {
-    document.getElementById('answers').innerHTML = '';
-    realtimequiz.answernumber = 0;
-}
-
-function realtimequiz_set_answer(id, text, position) {
-    if (realtimequiz.answernumber > realtimequiz.maxanswers || realtimequiz.answernumber < 0) {
-        alert(realtimequiz.text['invalidanswer'] + realtimequiz.answernumber + ' - ' + text);
-    }
-
-    var letter = String.fromCharCode(65 + realtimequiz.answernumber);        //ASCII 'A'
-    var newanswer = '<li id="answer'+id+'" class="realtimequiz-answer-pos-'+position+'"><input ';
-    if (realtimequiz.controlquiz) {
-        newanswer += 'disabled=disabled ';
-    }
-    newanswer += 'type="button" OnClick="realtimequiz_select_choice('+id+');"';
-    newanswer += ' value="&nbsp;&nbsp;'+letter+'&nbsp;&nbsp;" />&nbsp;&nbsp;';
-    newanswer += text + '<span class="result"><img src="'+realtimequiz.image['blank']+'" height="16" /></span><br /></li>';
-
-    document.getElementById('answers').innerHTML += newanswer;
-    realtimequiz.answernumber += 1;
-}
 
 function realtimequiz_set_question(response_xml_text) {
 
@@ -250,38 +220,7 @@ function realtimequiz_set_question(response_xml_text) {
             });
         });
 
-
-
-
-
     realtimequiz_start_timer(parseInt(node_text(response_xml.getElementsByTagName('questiontime').item(0))), false);
-}
-
-
-
-function realtimequiz_set_result(answerid, correct, count, nocorrect) {
-    var anscontainer = document.getElementById('answer'+answerid);
-    if (anscontainer) {
-        var ansimage = anscontainer.getElementsByTagName('span');
-        for (var i=0; i<ansimage.length; i++) {
-            if (ansimage[i].className == 'result') {
-                var result;
-                if (nocorrect) {
-                    result = '&nbsp;&nbsp'+count;
-                } else {
-                    result = "&nbsp;&nbsp;<img src='";
-                    if (correct) {
-                        result += realtimequiz.image['tick'] + "' alt='"+realtimequiz.text['tick']+"'";
-                    } else {
-                        result += realtimequiz.image['cross'] + "' cross.gif' alt='"+realtimequiz.text['cross']+"'";
-                    }
-                    result += " height='16' />&nbsp;&nbsp; " + count;
-                }
-                ansimage[i].innerHTML = result;
-                break;
-            }
-        }
-    }
 }
 
 async function submit_attempt_and_show_final_results(quizresponse){
@@ -311,7 +250,7 @@ async function submit_attempt_and_show_final_results(quizresponse){
 
 }
 
-// for now get the graph of the final results ... later the stats can be added to both teacher and studenst views
+// for now get the graph of the final results ... later the stats can be added to both teacher and students' views
 async function realtimequiz_show_final_results(quizresponse) {
 
   document.getElementById('questionnumber').innerHTML = '<h1>'+realtimequiz.text['finalresults']+'</h1>';
@@ -331,41 +270,17 @@ async function realtimequiz_show_final_results(quizresponse) {
 
       var myDiv = document.createElement('div');
       myDiv.id = 'ttt_div';
-      // just include html for now
-      locScript = myText.search('<script>');
-      html_to_display = myText.substring(0,locScript);
-      myDiv.innerHTML = html_to_display;
 
-      // get the only part of the script that is needed
-      tmpDiv = document.createElement('div');
-      tmpDiv.innerHTML = myText;
+      myDiv.innerHTML = myText;
 
-      var scripts = tmpDiv.getElementsByTagName('script');
+      var scripts = myDiv.getElementsByTagName('script');
+      script_lines = scripts[0].text;
 
-      for (var ix = 0; ix < scripts.length; ix++) {
+      document.getElementById('questiontext').innerHTML="";
+      document.getElementById('questiontext').appendChild(myDiv);
+      eval(script_lines);
 
-        if (scripts[ix].text.length > 0)
-        {
-          if (scripts[ix].text.includes("chart"))
-          {
-            //get rid of the first "x" lines - they are already included on the page
-            var lines = scripts[ix].text.split('\n');
 
-            last_line = lines[lines.length-1];
-
-            lines = lines.slice(10, lines.length-7);
-
-            script_lines = lines.join('\n');
-            script_lines = script_lines + last_line;
-
-          }
-        }
-        // the other scripts are already included in the file
-
-    }
-    document.getElementById('questiontext').innerHTML="";
-    document.getElementById('questiontext').appendChild(myDiv);
-    eval(script_lines);
   }
 
 
