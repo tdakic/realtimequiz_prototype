@@ -59,7 +59,6 @@ class renderer extends plugin_renderer_base {
      */
     public function review_page(realtimequiz_attempt $attemptobj, $slots, $page, $showall,
             $lastpage, display_options $displayoptions, $summarydata) {
-        //TTT made a few changes by commenting out the lines below
         $output = '';
         $output .= $this->header();
         $output .= $this->review_summary_table($summarydata, $page);
@@ -71,7 +70,24 @@ class renderer extends plugin_renderer_base {
         $output .= $this->footer();
         return $output;
     }
+/*******************************************************************************************
+/* TTT added the following function todisplay only the for part of the feedback */
 
+    public function review_page_RT(realtimequiz_attempt $attemptobj, $slots, $page, $showall,
+            $lastpage, display_options $displayoptions, $summarydata) {
+        //TTT made a few changes by commenting out the lines below
+        $output = '';
+        //$output .= $this->header();
+        //$output .= $this->review_summary_table($summarydata, $page);
+        $output .= $this->review_form($page, $showall, $displayoptions,
+                $this->questions($attemptobj, true, $slots, $page, $showall, $displayoptions),
+                $attemptobj);
+
+        //$output .= $this->review_next_navigation($attemptobj, $page, $lastpage, $showall);
+        //$output .= $this->footer();
+        return $output;
+    }
+/**************************************************************************************
     /**
      * Renders the review question pop-up.
      *
