@@ -433,7 +433,7 @@ function realtime_quiz_process_response_xml(response_xml_text)
         }
 
         const parser = new DOMParser();
-        const response_xml = parser.parseFromString(response_xml_text, 'text/xml');
+        const response_xml = parser.parseFromString(response_xml_text, 'text/html');
 
         var quizresponse = response_xml.getElementsByTagName('realtimequiz').item(0);
 
@@ -498,29 +498,25 @@ function realtime_quiz_process_response_xml(response_xml_text)
                   realtimequiz_init_question_view();
 
                   var questionnum = parseInt(node_text(quizresponse.getElementsByTagName('questionnum').item(0)));
-                  var total = node_text(response_xml.getElementsByTagName('questioncount').item(0));
+                  var total = node_text(quizresponse.getElementsByTagName('questioncount').item(0));
 
                   realtimequiz_set_question_number(questionnum,total);
 
-                  loc3 = response_xml_text.search('<form');
+                  html_to_display = quizresponse.getElementsByTagName('result').item(0);
 
-                  html_to_display = response_xml_text.substring(loc3,response_xml_text.length);
+                  var tmp_div = document.createElement('div');
+                  tmp_div.id = 'feedback_div';
 
-                  // make the info part of the form not visible???
-                  loc4 = html_to_display.search('<div class="info"');
-                  html_to_display = html_to_display.substring(0,loc4+17) +'style="display:none"' + html_to_display.substring(loc4+17,response_xml_text.length);
+                  tmp_div.innerHTML = html_to_display.innerHTML;
+                  document.getElementById('questiontext').innerHTML="";
+                  document.getElementById('questiontext').appendChild(tmp_div);
 
-                  // get rid of everything after the form
-                  loc5 = html_to_display.search('</form');
+                  /* could there be more than one question per page? */
+                  info_section = document.getElementsByClassName("info");
+                  for (var i = 0; i < info_section.length; i++) {
+                      info_section[i].style.display = 'none';
+                  }
 
-                  html_to_display = html_to_display.substring(0,loc5);
-
-                  //get rid of the submit button
-                  loc6 = html_to_display.search('<div class="submitbtns"');
-                  html_to_display = html_to_display.substring(0,loc6+23) +' style="display:none"' + html_to_display.substring(loc6+23,response_xml_text.length);
-
-                  document.getElementById('questiontext').innerHTML = html_to_display;
-                  //document.getElementById('questiontext').innerHTML = response_xml_text;
 
                   //if you are the teacher, display the statistics for the question
                   // else add displaying averages for students?
@@ -528,7 +524,6 @@ function realtime_quiz_process_response_xml(response_xml_text)
                   {
                       get_question_stats();
                   }
-
 
                   if (questionnum != realtimequiz.questionnumber) {
                       // If you have just joined and missed the question

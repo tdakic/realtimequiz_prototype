@@ -271,7 +271,7 @@ $navbc = $attemptobj->get_navigation_panel($output, navigation_panel_review::cla
 $regions = $PAGE->blocks->get_regions();
 $PAGE->blocks->add_fake_block($navbc, reset($regions));
 
-echo $output->review_page($attemptobj, $slots, $page, $showall, $lastpage, $options, $summarydata);
+echo $output->review_page_RT($attemptobj, $slots, $page, $showall, $lastpage, $options, $summarydata);
 
 // Trigger an event for this review.
 $attemptobj->fire_attempt_reviewed_event();
